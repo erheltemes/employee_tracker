@@ -249,7 +249,6 @@ function viewEmployees() {
                     return `${manSearch.first_name} ${manSearch.last_name}`
                 }
             })
-            console.log(managerSearch)
             let managerName = managerSearch.filter(val => val !== undefined)[0]
             if (managerName === undefined) {
                 return {
