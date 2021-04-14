@@ -46,13 +46,13 @@ INSERT INTO role (title, salary, department_id)
 VALUES ("Head of Finance", 100000, 2);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Salesman", 60000,  2);
+VALUES ("Salesman", 60000,  1);
 
 INSERT INTO role (title, salary, department_id)
 VALUES ("Finance Analyst", 70000,  2);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Finance Assistant", 55000,  1);
+VALUES ("Finance Assistant", 55000,  2);
 
 
 
