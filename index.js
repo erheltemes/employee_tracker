@@ -58,7 +58,7 @@ function addRole() {
             },
             {
                 type: 'list',
-                message: "Assciated Department",
+                message: "Associated Department",
                 name: 'depIdName',
                 choices: displayDepartments
             }
@@ -143,6 +143,8 @@ function afterAddEmployee(empFirstName, empLastName, roleId, mangerId) {
     })
 }
 
+//Update Connection
+
 function updateEmployee() { 
     connection.query('SELECT id, title FROM role', 
     (err, roleRes) => {
@@ -219,8 +221,9 @@ function afterUpdateEmployee(chosenEmpId, chosenRoleId, chosenManagerId) {
 // View Connections
 function viewDepartments() {
     connection.query('SELECT id, name FROM department', 
-    (err, res) => {
+    (err, res) => {1
         if (err) throw err
+        console.log(res)
         console.table(res)
         menuLoad()
     })
@@ -236,13 +239,155 @@ function viewRoles() {
 }
 
 function viewEmployees() { 
-    connection.query('SELECT employee.id, first_name, last_name, title, salary, department.name FROM employee LEFT JOIN role ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id', 
+    connection.query('SELECT employee.id, first_name, last_name, title, salary, department.name, manager_id FROM employee LEFT JOIN role ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id', 
     (err, res) => {
         if (err) throw err
-        console.table(res)
+
+        const tableDis = res.map(obj => {
+            let managerSearch = res.map(manSearch => {
+                if (obj.manager_id === manSearch.id) {
+                    return `${manSearch.first_name} ${manSearch.last_name}`
+                }
+            })
+            console.log(managerSearch)
+            let managerName = managerSearch.filter(val => val !== undefined)[0]
+            if (managerName === undefined) {
+                return {
+                    id: obj.id,
+                    name: `${obj.first_name} ${obj.last_name}`,
+                    salary: obj.salary,
+                    title: obj.title,
+                    manager: null,
+                    department_name: obj.name
+                }
+            }
+            else return {
+                id: obj.id,
+                name: `${obj.first_name} ${obj.last_name}`,
+                salary: obj.salary,
+                title: obj.title,
+                manager: managerName,
+                department_name: obj.name
+            }
+        })
+
+        console.table(tableDis)
         menuLoad()
+        
     })
 }
+
+// Delete Connections
+function deleteDepartment() {
+    connection.query('SELECT id, name FROM department',
+    (err, departmentRes) => {
+        if (err) throw err
+        
+        departmentRes.forEach(dept => {
+            dept.display = `${dept.name}, Id:${dept.id}` 
+        })
+
+        departmentRes.push(nulldata = {display: "Return to main menu"})
+        const displayDepartments = departmentRes.map(dept => dept.display)
+        
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: "Delete Department",
+                name: 'depIdName',
+                choices: displayDepartments
+            }
+        ])
+        .then(response => {
+            const {depIdName} = response
+            if (response === "Return to main menu") {menuLoad()}
+            else {
+                const chosenDept = departmentRes.filter(dept => dept.display === depIdName)[0]
+                afterDeleteDepartment(chosenDept.id)
+            }
+        })
+    })
+}
+
+function afterDeleteDepartment(deptId) {
+    connection.query(`DELETE FROM department WHERE ?`, { id: deptId })
+    console.log("Sucessfully deleted")
+    menuLoad()
+}
+
+function deleteRole() {
+    connection.query('SELECT id, title FROM role',
+    (err, roleRes) => {
+        if (err) throw err
+        
+        roleRes.forEach(role => {
+            role.display = `${role.title}, Id:${role.id}` 
+        })
+
+        roleRes.push(nulldata = {display: "Return to main menu"})
+        const displayRoles = roleRes.map(role => role.display)
+        
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: "Delete role",
+                name: 'roleIdName',
+                choices: displayRoles
+            }
+        ])
+        .then(response => {
+            const {roleIdName} = response
+            if (response === "Return to main menu") {menuLoad()}
+            else {
+                const chosenRole = roleRes.filter(role => role.display === roleIdName)[0]
+                afterDeleteRole(chosenRole.id)
+            }
+        })
+    })
+}
+
+function afterDeleteRole(roleId) {
+    connection.query(`DELETE FROM role WHERE ?`, { id: roleId })
+    console.log("Sucessfully deleted")
+    menuLoad()
+}
+
+function deleteEmployee() {
+    connection.query('SELECT id, first_name, last_name FROM employee',
+    (err, empRes) => {
+        if (err) throw err
+        empRes.forEach(emp => {
+            emp.display = `${emp.first_name} ${emp.last_name}, Id:${emp.id}` 
+        })
+
+        empRes.push(nulldata = {display: "Return to main menu"})
+        const displayEmployees = empRes.map(emp => emp.display)
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: "Delete emp",
+                name: 'empIdName',
+                choices: displayEmployees
+            }
+        ])
+        .then(response => {
+            const {empIdName} = response
+            if (response === "Return to main menu") {menuLoad()}
+            else {
+                const chosenEmp = empRes.filter(emp => emp.display === empIdName)[0]
+                afterDeleteEmployee(chosenEmp.id)
+            }
+        })
+    })
+}
+
+function afterDeleteEmployee(empId) {
+    connection.query(`DELETE FROM employee WHERE ?`, { id: empId })
+    console.log("Sucessfully deleted")
+    menuLoad()
+}
+
+
 
 function afterMenuLoad(response) {
     if (response.menu === 'add department') {addDepartment()}
@@ -252,6 +397,9 @@ function afterMenuLoad(response) {
     if (response.menu === 'view departments') {viewDepartments()}
     if (response.menu === 'view roles') {viewRoles()}
     if (response.menu === 'view employees') {viewEmployees()}
+    if (response.menu === 'delete department') {deleteDepartment()}
+    if (response.menu === 'delete role') {deleteRole()}
+    if (response.menu === 'delete employee') {deleteEmployee()}
     if (response.menu === 'end') {connection.end()}
 }
 
@@ -269,6 +417,9 @@ function menuLoad() {
                 'view departments',
                 'view roles',
                 'view employees',
+                'delete department',
+                'delete role',
+                'delete employee',
                 'end'
             ]
         }

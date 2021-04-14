@@ -32,24 +32,27 @@ CREATE TABLE employee (
 
 
 INSERT INTO department (name)
-VALUES ("Web Development");
+VALUES ("Sales");
 
 INSERT INTO department (name)
-VALUES ("Customer Service");
+VALUES ("Finance");
 
 
-
-INSERT INTO role (title, salary)
-VALUES ("manager", 120000);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("engineer", 60000, 2);
+VALUES ("Head of Sales", 120000, 1);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Web Development Intern", 0,  2);
+VALUES ("Head of Finance", 100000, 2);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Customer Sevice Intern", 0,  1);
+VALUES ("Salesman", 60000,  2);
+
+INSERT INTO role (title, salary, department_id)
+VALUES ("Finance Analyst", 70000,  2);
+
+INSERT INTO role (title, salary, department_id)
+VALUES ("Finance Assistant", 55000,  1);
 
 
 
@@ -58,31 +61,21 @@ VALUES ("Customer Sevice Intern", 0,  1);
 INSERT INTO employee (first_name, last_name, role_id)
 VALUES ("Herb", "Plant", 1);
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Paul", "Heltemes", 2, 1);
+INSERT INTO employee (first_name, last_name, role_id)
+VALUES ("Paul", "Sampson", 2);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Ryan", "Heltemes", 3, 1);
+VALUES ("Ryan", "Conley", 4, 2);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("George", "Clooney", 3, 1);
+VALUES ("George", "Erickson", 5, 2);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Mary", "Skaret", 4, 1);
+VALUES ("Mary", "Skaret", 3, 1);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Brent", "Drake", 4, 1);
+VALUES ("Brent", "Drake", 3, 1);
 
 
 
 
-
-
-
--- SELECT name
--- FROM department RIGHT JOIN role ON department.id = role.department_id;
-
--- SELECT employee.id, first_name, last_name, title, salary, department.name
--- FROM employee 
--- RIGHT JOIN role ON role.id = employee.role_id
--- RIGHT JOIN department ON department.id = role.department_id
